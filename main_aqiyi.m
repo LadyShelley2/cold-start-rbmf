@@ -6,6 +6,7 @@ colon = char(58);
 
 %% 读取数据
 load('./data/freq_matrix_bool.mat');
+load('./data/freq_matrix.mat');
 [n_cinema,n_movie] = size(freq_matrix);
 %% 划分训练数据和测试数据
 identity_cinema = eye(n_cinema);
@@ -16,7 +17,7 @@ freq_matrix = perm_cinema*freq_matrix;
 n_train = floor(0.8*n_cinema);
 train_matrix = freq_matrix(1:n_train,:);
 test_matrix = freq_matrix(n_train+1:end,:);
-
+train_matrix_raw = freq_matrix_raw(1:n_train,:);
 
 %% 计算代表性列
 
@@ -45,13 +46,20 @@ prediction_random = test_matrix(:,sub_matrix_index_random)*loading_matrix_random
 prediction(find(prediction<0))=0;
 prediction_random(find(prediction_random<0))=0;
 %% 评估模型
+% 评估覆盖率和多样性
+% 覆盖率
+cov = coverage(train_matrix_raw,sub_matrix_index,2);
+cov_random = coverage(train_matrix_raw,sub_matrix_index_random,2);
+
+diver = diversity(train_matrix_raw,sub_matrix_index,2);
+diver_random = diversity(train_matrix_raw,sub_matrix_index_random,2);
 
 % precision_at_10
 n_test = size(test_matrix,1);
 precision_at_ks = [];
 for i = 1:n_test
     [sortes_row,index] = sort(prediction(i,:),'descend');
-    precision = precision_at_k(test_matrix(i,index),10);
+    precision = average_precision(test_matrix(i,index),10);
     if(precision>1)
         disp('error')
     end
@@ -63,7 +71,7 @@ sum(precision_at_ks)/n_test
 precision_at_ks_random = [];
 for i = 1:n_test
     [sortes_row,index] = sort(prediction_random(i,:),'descend');
-    precision = precision_at_k(test_matrix(i,index),10);
+    precision = average_precision(test_matrix(i,index),10);
     precision_at_ks_random = [precision_at_ks_random precision];
 end
 disp('random precision')

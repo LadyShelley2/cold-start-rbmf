@@ -1,0 +1,9 @@
+% dim=1 表示按行
+% dim=2 表示按列
+function cov = coverage(data,index,dim)
+    [n_row,n_col]=size(data);
+    if(dim==1)
+        cov = sum(data(:,index))/(n_row*n_col);
+        
+    end
+end
