@@ -25,7 +25,7 @@ while(i<n_iter)
         break;
     end
 end
-plot(det_vals)
-figure;
-plot(det_vals_inv)
+% plot(det_vals)
+% figure;
+% plot(det_vals_inv)
 res_index = p(1:k);
